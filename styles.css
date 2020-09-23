@@ -1,0 +1,16 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    padding: 2rem;
+}
+
+#edit-text {
+    height: 100%;
+    padding: 1em;
+}
