@@ -1,6 +1,27 @@
 /* jshint node: true */
 
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu, shell} = require('electron');
+const defaultMenu = require('electron-default-menu');
+
+function createMenu(){
+    // Get the default menu template
+    const template = defaultMenu(app, shell);
+    
+    // Add to the template
+    // (Splice Menu Items into the template array)
+    template.splice(0, 0, {
+        label: 'File',
+        submenu: [{
+            label: 'Test',
+            click: (item, focusedWindow) => {
+                console.log("Huzzah! You don't have to rebuild the whole default menu!");
+            }
+        }]
+    });
+    
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+}
 
 function createWindow(){
     // Create the browser window
@@ -19,10 +40,15 @@ function createWindow(){
     // win.webContents.openDevTools();
 }
 
+function init(){
+    createMenu();
+    createWindow();
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // (Some APIs can only be used after this occurs.)
-app.whenReady().then(createWindow);
+app.whenReady().then(init);
 
 // Quit when all windows are closed, except on macOS. There,
 // it's common for applications and their menu bar to stay
