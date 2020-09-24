@@ -53,7 +53,7 @@ function createMenu(){
             label: 'Save',
             accelerator: 'CmdOrCtrl+S',
             click: (item, focusedWindow) => {
-                focusedWindow.webContents.send('save');
+                focusedWindow.webContents.send('save', focusedWindow.id);
             }
         }, {
             label: 'Save as',
@@ -79,8 +79,7 @@ function createWindow(){
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true,
-            enableRemoteModule: true
+            nodeIntegration: true
         }
     });
     
@@ -111,6 +110,9 @@ function openSaveAsDialog(targetWindow){
       });
 }
 
+// Respond to a Renderer process requesting to open the save dialog.
+// The Renderer will trigger a save dialog request when the user
+// initiates a save (Ctrl/Cmd+S) with no open/saved file as the current file.
 ipcMain.on('open-save-dialog', (event, windowId) => {
     const win = BrowserWindow.fromId(windowId);
     openSaveAsDialog(win);

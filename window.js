@@ -1,6 +1,6 @@
 /* jshint node: true */
 
-const {ipcRenderer, remote} = require('electron');
+const {ipcRenderer} = require('electron');
 const fs = require('fs');
 
 const editText = document.querySelector('#edit-text');
@@ -9,17 +9,19 @@ const title = document.querySelector('title');
 let currentFile = '';
 let unsavedChanges = false;
 
-ipcRenderer.on('save', (event) => {
-    if(currentFile === ''){
+// Respond to the 'save' menu item or shortcut.
+// This saves the current file or requests to open the save dialog if there's no current file.
+ipcRenderer.on('save', (event, windowId) => {
+    if(currentFile !== ''){
+        saveFile(currentFile); // Automatically save to the current file
+    }else{
         // Send a message to the main process to open the save dialog.
         // Additionally passing the window id to include in the dialog creation.
-        const win = remote.getCurrentWindow();
-        ipcRenderer.send('open-save-dialog', win.id);
-    }else{
-        saveFile(currentFile); // Automatically save to the current file
+        ipcRenderer.send('open-save-dialog', windowId);
     }
 });
 
+// Respond to the returned path of the save dialog
 ipcRenderer.on('save-as', (event, savePath) => {
     console.log(savePath);
     console.log(editText.value);
@@ -27,6 +29,7 @@ ipcRenderer.on('save-as', (event, savePath) => {
     saveFile(savePath);
 });
 
+// Respond to the returned path(s) of the open dialog
 ipcRenderer.on('open', (event, openPaths) => {
     unsavedChanges = false;
     
@@ -68,6 +71,8 @@ function saveFile(savePath){
     });
 }
 
+// Listen for input changes on the text area
+// and display an indication of unsaved changes
 editText.addEventListener('input', (event) => {
     if(!unsavedChanges){
         unsavedChanges = true;
