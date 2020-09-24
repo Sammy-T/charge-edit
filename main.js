@@ -2,7 +2,22 @@
 
 const {app, BrowserWindow, Menu, shell, dialog} = require('electron');
 const defaultMenu = require('electron-default-menu');
-const fs = require('fs');
+
+let docPath = null;
+
+// Create the documents directory if it doesn't already exist
+function initDirectory(){
+    const fs = require('fs');
+    const path = require('path');
+    
+    docPath = path.join(app.getAppPath(), '/documents');
+    
+    fs.mkdir(docPath, err => {
+            if(err){
+                console.log(`Warn: Unable to create directory at ${docPath}\n${err}`);
+            }
+        });
+}
 
 function createMenu(){
     // Get the default menu template
@@ -22,19 +37,21 @@ function createMenu(){
             accelerator: 'CmdOrCtrl+S',
             click: (item, focusedWindow) => {
                 const options = {
-                    title: 'Charge Edit - Save as'
+                    title: 'Charge Edit - Save as',
+                    defaultPath: docPath,
+                    filters: [
+                        {name: 'Text Documents (*.txt)', extensions: ['txt']},
+                        {name: 'All Files', extensions: ['*']}
+                    ]
                 };
                 
                 dialog.showSaveDialog(focusedWindow, options)
                     .then(result => {
-                    console.log(`SaveDialogResult:\ncanceled=${result.canceled}\npath=${result.filePath}`);
+                    // console.log(`SaveDialogResult:\ncanceled=${result.canceled}\npath=${result.filePath}`);
                     
+                    // If the file path has a value, send the path to the renderer window
                     if(result.filePath){
-                        fs.writeFile(result.filePath, 'Hello new document?', 'utf8', err => {
-                            if(err){
-                                console.log(err);
-                            }
-                        });
+                        focusedWindow.webContents.send('save-as', result.filePath);
                     }
                   }).catch(err => {
                     console.log(err);
@@ -73,6 +90,7 @@ function createWindow(){
 // initialization and is ready to create browser windows.
 // (Some APIs can only be used after this occurs.)
 app.whenReady().then(() => {
+    initDirectory();
     createMenu();
     createWindow();
 });
