@@ -34,6 +34,12 @@ function createMenu(){
                 focusedWindow.webContents.send('new');
             }
         }, {
+            label: 'New Window',
+            accelerator: 'CmdOrCtrl+Shift+N',
+            click: (item, focusedWindow) => {
+                createWindow();
+            }
+        }, {
             label: 'Open',
             accelerator: 'CmdOrCtrl+O',
             click: (item, focusedWindow) => {
@@ -66,6 +72,7 @@ function createMenu(){
             type: 'separator'
         }, {
             label: 'Exit',
+            accelerator: 'CmdOrCtrl+Q',
             role: 'quit'
         }]
     });
