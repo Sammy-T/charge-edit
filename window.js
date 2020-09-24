@@ -9,6 +9,16 @@ const title = document.querySelector('title');
 let currentFile = '';
 let unsavedChanges = false;
 
+// Respond to the 'new' menu item or shortcut.
+// Resets the window condition and clears the current file.
+ipcRenderer.on('new', (event) => {
+    editText.value = '';
+    currentFile = '';
+    unsavedChanges = false;
+    
+    updateCurrentFile(currentFile);
+});
+
 // Respond to the 'save' menu item or shortcut.
 // This saves the current file or requests to open the save dialog if there's no current file.
 ipcRenderer.on('save', (event, windowId) => {

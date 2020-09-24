@@ -28,9 +28,10 @@ function createMenu(){
     template.splice(0, 0, {
         label: 'File',
         submenu: [{
-            label: 'Test',
+            label: 'New',
+            accelerator: 'CmdOrCtrl+N',
             click: (item, focusedWindow) => {
-                console.log("Huzzah! You don't have to rebuild the whole default menu!");
+                focusedWindow.webContents.send('new');
             }
         }, {
             label: 'Open',
