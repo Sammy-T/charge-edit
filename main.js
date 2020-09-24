@@ -1,6 +1,6 @@
 /* jshint node: true */
 
-const {app, BrowserWindow, Menu, shell, dialog} = require('electron');
+const {app, BrowserWindow, Menu, shell, dialog, ipcMain} = require('electron');
 const defaultMenu = require('electron-default-menu');
 
 let docPath = null;
@@ -53,25 +53,13 @@ function createMenu(){
             label: 'Save',
             accelerator: 'CmdOrCtrl+S',
             click: (item, focusedWindow) => {
-                const options = {
-                    title: 'Charge Edit - Save as',
-                    defaultPath: docPath,
-                    filters: [
-                        {name: 'Text Documents (*.txt)', extensions: ['txt']},
-                        {name: 'All Files', extensions: ['*']}
-                    ]
-                };
-                
-                dialog.showSaveDialog(focusedWindow, options).then(result => {
-                    // console.log(`SaveDialogResult:\ncanceled=${result.canceled}\npath=${result.filePath}`);
-                    
-                    // If the file path has a value, send the path to the renderer window
-                    if(result.filePath){
-                        focusedWindow.webContents.send('save-as', result.filePath);
-                    }
-                  }).catch(err => {
-                    console.log(err);
-                  });
+                focusedWindow.webContents.send('save');
+            }
+        }, {
+            label: 'Save as',
+            accelerator: 'CmdOrCtrl+Shift+S',
+            click: (item, focusedWindow) => {
+                openSaveAsDialog(focusedWindow);
             }
         }, {
             type: 'separator'
@@ -91,7 +79,8 @@ function createWindow(){
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            enableRemoteModule: true
         }
     });
     
@@ -101,6 +90,31 @@ function createWindow(){
     // Open the DevTools
     // win.webContents.openDevTools();
 }
+
+function openSaveAsDialog(targetWindow){
+    const options = {
+        title: 'Charge Edit - Save as',
+        defaultPath: docPath,
+        filters: [
+            {name: 'Text Documents (*.txt)', extensions: ['txt']},
+            {name: 'All Files', extensions: ['*']}
+        ]
+    };
+
+    dialog.showSaveDialog(targetWindow, options).then(result => {
+        // If the file path has a value, send the path to the renderer window
+        if(result.filePath){
+            targetWindow.webContents.send('save-as', result.filePath);
+        }
+      }).catch(err => {
+        console.log(err);
+      });
+}
+
+ipcMain.on('open-save-dialog', (event, windowId) => {
+    const win = BrowserWindow.fromId(windowId);
+    openSaveAsDialog(win);
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
