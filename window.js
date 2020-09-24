@@ -15,3 +15,17 @@ ipcRenderer.on('save-as', (event, savePath) => {
         }
     });
 });
+
+ipcRenderer.on('open', (event, openPaths) => {
+    console.log(openPaths);
+    
+    fs.readFile(openPaths[0], 'utf8', (err, data) => {
+        if(err){
+            console.error(err);
+            return;
+        }
+        
+        console.log(data);
+        editText.value = data;
+    });
+});

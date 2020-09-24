@@ -33,6 +33,23 @@ function createMenu(){
                 console.log("Huzzah! You don't have to rebuild the whole default menu!");
             }
         }, {
+            label: 'Open',
+            accelerator: 'CmdOrCtrl+O',
+            click: (item, focusedWindow) => {
+                const options = {
+                    title: 'Charge Edit - Open a file',
+                    defaultPath: docPath
+                };
+                
+                dialog.showOpenDialog(focusedWindow, options).then(result => {
+                    if(result.filePaths.length > 0){
+                        focusedWindow.webContents.send('open', result.filePaths);
+                    }
+                }).catch(err => {
+                    console.log(err);
+                });
+            }
+        }, {
             label: 'Save',
             accelerator: 'CmdOrCtrl+S',
             click: (item, focusedWindow) => {
@@ -45,8 +62,7 @@ function createMenu(){
                     ]
                 };
                 
-                dialog.showSaveDialog(focusedWindow, options)
-                    .then(result => {
+                dialog.showSaveDialog(focusedWindow, options).then(result => {
                     // console.log(`SaveDialogResult:\ncanceled=${result.canceled}\npath=${result.filePath}`);
                     
                     // If the file path has a value, send the path to the renderer window
