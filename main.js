@@ -1,7 +1,8 @@
 /* jshint node: true */
 
-const {app, BrowserWindow, Menu, shell} = require('electron');
+const {app, BrowserWindow, Menu, shell, dialog} = require('electron');
 const defaultMenu = require('electron-default-menu');
+const fs = require('fs');
 
 function createMenu(){
     // Get the default menu template
@@ -16,6 +17,34 @@ function createMenu(){
             click: (item, focusedWindow) => {
                 console.log("Huzzah! You don't have to rebuild the whole default menu!");
             }
+        }, {
+            label: 'Save',
+            accelerator: 'CmdOrCtrl+S',
+            click: (item, focusedWindow) => {
+                const options = {
+                    title: 'Charge Edit - Save as'
+                };
+                
+                dialog.showSaveDialog(focusedWindow, options)
+                    .then(result => {
+                    console.log(`SaveDialogResult:\ncanceled=${result.canceled}\npath=${result.filePath}`);
+                    
+                    if(result.filePath){
+                        fs.writeFile(result.filePath, 'Hello new document?', 'utf8', err => {
+                            if(err){
+                                console.log(err);
+                            }
+                        });
+                    }
+                  }).catch(err => {
+                    console.log(err);
+                  });
+            }
+        }, {
+            type: 'separator'
+        }, {
+            label: 'Exit',
+            role: 'quit'
         }]
     });
     
@@ -40,15 +69,13 @@ function createWindow(){
     // win.webContents.openDevTools();
 }
 
-function init(){
-    createMenu();
-    createWindow();
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // (Some APIs can only be used after this occurs.)
-app.whenReady().then(init);
+app.whenReady().then(() => {
+    createMenu();
+    createWindow();
+});
 
 // Quit when all windows are closed, except on macOS. There,
 // it's common for applications and their menu bar to stay
