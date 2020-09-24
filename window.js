@@ -6,10 +6,11 @@ const fs = require('fs');
 const editText = document.querySelector('#edit-text');
 const title = document.querySelector('title');
 
-let currentFile = null;
+let currentFile = '';
+let unsavedChanges = false;
 
 ipcRenderer.on('save', (event) => {
-    if(currentFile === null){
+    if(currentFile === ''){
         // Send a message to the main process to open the save dialog.
         // Additionally passing the window id to include in the dialog creation.
         const win = remote.getCurrentWindow();
@@ -27,6 +28,8 @@ ipcRenderer.on('save-as', (event, savePath) => {
 });
 
 ipcRenderer.on('open', (event, openPaths) => {
+    unsavedChanges = false;
+    
     console.log(openPaths);
     updateCurrentFile(openPaths[0]);
     
@@ -44,7 +47,13 @@ ipcRenderer.on('open', (event, openPaths) => {
 // Updates the current file and the window title
 function updateCurrentFile(filePath){
     currentFile = filePath;
-    title.innerHTML = `Charge Edit - ${filePath}`;
+    
+    let titleText = `Charge Edit - ${filePath}`;
+    if(unsavedChanges){
+        titleText += "*";
+    }
+    
+    title.innerHTML = titleText;
 }
 
 function saveFile(savePath){
@@ -54,6 +63,14 @@ function saveFile(savePath){
             return;
         }
         
+        unsavedChanges = false;
         updateCurrentFile(savePath);
     });
 }
+
+editText.addEventListener('input', (event) => {
+    if(!unsavedChanges){
+        unsavedChanges = true;
+        updateCurrentFile(currentFile);
+    }
+});
