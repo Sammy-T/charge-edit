@@ -106,10 +106,6 @@ function createWindow(){
 
 function addWindowListeners(win){
     win.webContents.on('context-menu', (event, params) => {
-        if(params.dictionarySuggestions.length === 0){
-            return; // For the time being, only create menus for spelling suggestions
-        }
-        
         const menu = new Menu();
         
         /* jshint -W083 */
@@ -132,9 +128,56 @@ function addWindowListeners(win){
                     win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord);
                 }
             }));
+            menu.append(new MenuItem({ type: 'separator' }));
         }
         
-        menu.popup({window: win});
+        let editFlags = params.editFlags;
+        if(editFlags.canUndo){
+            menu.append(new MenuItem({
+                label: 'Undo',
+                accelerator: 'CmdOrCtrl+Z',
+                role: 'undo'
+            }));
+        }
+        if(editFlags.canRedo){
+            menu.append(new MenuItem({
+                label: 'Redo',
+                accelerator: 'Shift+CmdOrCtrl+Z',
+                role: 'redo'
+            }));
+        }
+        if(editFlags.canCut){
+            menu.append(new MenuItem({
+                label: 'Cut',
+                accelerator: 'CmdOrCtrl+X',
+                role: 'cut'
+            }));
+        }
+        if(editFlags.canCopy){
+            menu.append(new MenuItem({
+                label: 'Copy',
+                accelerator: 'CmdOrCtrl+C',
+                role: 'copy'
+            }));
+        }
+        if(editFlags.canPaste){
+            menu.append(new MenuItem({
+                label: 'Paste',
+                accelerator: 'CmdOrCtrl+V',
+                role: 'paste'
+            }));
+        }
+        if(editFlags.canSelectAll){
+            menu.append(new MenuItem({
+                label: 'Select All',
+                accelerator: 'CmdOrCtrl+A',
+                role: 'selectall'
+            }));
+        }        
+        
+        if(menu.items.length > 0){
+            menu.popup({window: win});
+        }
     });
 }
 
