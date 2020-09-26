@@ -89,37 +89,26 @@ function saveFile(savePath){
     });
 }
 
-// Builds the tab character based on the set tab spaces
-function tabChar(){
-    let tabCh = '';
-    
-    for(let i=0; i < tabSpaces; i++){
-        tabCh += ' ';
-    }
-    
-    return tabCh;
-}
-
 // Listen for input changes on the text area
 // and display an indication of unsaved changes
-editText.addEventListener('input', (event) => {
+editText.addEventListener('input', function(event) {
     if(!unsavedChanges){
         unsavedChanges = true;
         updateCurrentFile(currentFile);
     }
 });
 
-editText.onkeydown = (event) => {
+editText.onkeydown = function(event) {
     // Listen for Tab key events on the text area
     if(event.key === 'Tab'){
         event.preventDefault();
         
-        const selectStart = editText.selectionStart;
+        const selectStart = this.selectionStart;
         
         // Insert the tab spaces at the selection
-        editText.value = editText.value.substr(0, editText.selectionStart) + tabChar() + editText.value.substr(editText.selectionEnd);
+        this.value = this.value.substr(0, this.selectionStart) + ' '.repeat(tabSpaces) + this.value.substr(this.selectionEnd);
         
-        editText.selectionEnd = selectStart + tabSpaces; // Update the selection position
+        this.selectionEnd = selectStart + tabSpaces; // Update the selection position
         
         // Update the unsaved changes
         if(!unsavedChanges){
