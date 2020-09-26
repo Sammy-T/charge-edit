@@ -3,8 +3,9 @@
 const {ipcRenderer} = require('electron');
 const fs = require('fs');
 
-const editText = document.querySelector('#edit-text');
 const title = document.querySelector('title');
+const editText = document.querySelector('#edit-text');
+const fileStatus = document.querySelector('#file-status');
 
 let currentFile = '';
 let unsavedChanges = false;
@@ -57,13 +58,18 @@ ipcRenderer.on('open', (event, openPaths) => {
     });
 });
 
-// Updates the current file and the window title
+// Updates the current file and the save status
 function updateCurrentFile(filePath){
     currentFile = filePath;
     
     let titleText = `Charge Edit - ${filePath}`;
     if(unsavedChanges){
         titleText += "*";
+        fileStatus.innerHTML = "unsaved";
+    }else if(filePath === ''){
+        fileStatus.innerHTML = "unsaved";
+    }else{
+        fileStatus.innerHTML = "saved";
     }
     
     title.innerHTML = titleText;
