@@ -10,6 +10,8 @@ const fileStatus = document.querySelector('#file-status');
 let currentFile = '';
 let unsavedChanges = false;
 
+let tabSpaces = 4;
+
 // Respond to the 'new' menu item or shortcut.
 // Resets the window condition and clears the current file.
 ipcRenderer.on('new', (event) => {
@@ -87,6 +89,17 @@ function saveFile(savePath){
     });
 }
 
+// Builds the tab character based on the set tab spaces
+function tabChar(){
+    let tabCh = '';
+    
+    for(let i=0; i < tabSpaces; i++){
+        tabCh += ' ';
+    }
+    
+    return tabCh;
+}
+
 // Listen for input changes on the text area
 // and display an indication of unsaved changes
 editText.addEventListener('input', (event) => {
@@ -95,3 +108,23 @@ editText.addEventListener('input', (event) => {
         updateCurrentFile(currentFile);
     }
 });
+
+editText.onkeydown = (event) => {
+    // Listen for Tab key events on the text area
+    if(event.key === 'Tab'){
+        event.preventDefault();
+        
+        const selectStart = editText.selectionStart;
+        
+        // Insert the tab spaces at the selection
+        editText.value = editText.value.substr(0, editText.selectionStart) + tabChar() + editText.value.substr(editText.selectionEnd);
+        
+        editText.selectionEnd = selectStart + tabSpaces; // Update the selection position
+        
+        // Update the unsaved changes
+        if(!unsavedChanges){
+            unsavedChanges = true;
+            updateCurrentFile(currentFile);
+        }
+    }
+};
