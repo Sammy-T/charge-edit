@@ -1,6 +1,6 @@
 /* jshint node: true */
 
-const {app, BrowserWindow, Menu, shell, dialog, ipcMain} = require('electron');
+const {app, BrowserWindow, Menu, MenuItem, shell, dialog, ipcMain} = require('electron');
 const defaultMenu = require('electron-default-menu');
 
 let docPath = null;
@@ -95,11 +95,47 @@ function createWindow(){
         }
     });
     
+    addWindowListeners(win);
+    
     // Load the index.html of the app
     win.loadFile('index.html');
     
     // Open the DevTools
     // win.webContents.openDevTools();
+}
+
+function addWindowListeners(win){
+    win.webContents.on('context-menu', (event, params) => {
+        if(params.dictionarySuggestions.length === 0){
+            return; // For the time being, only create menus for spelling suggestions
+        }
+        
+        const menu = new Menu();
+        
+        /* jshint -W083 */
+        // Add each spelling suggestion
+        for(const suggestion of params.dictionarySuggestions){
+            menu.append(new MenuItem({
+                label: suggestion,
+                click: () => {
+                    win.webContents.replaceMisspelling(suggestion);
+                }
+            }));
+        }
+        /* jshint +W083 */
+        
+        // Allow users to add misspelled words to the dictionary
+        if(params.misspelledWord){
+            menu.append(new MenuItem({
+                label: 'Add to dictionary',
+                click: () => {
+                    win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord);
+                }
+            }));
+        }
+        
+        menu.popup({window: win});
+    });
 }
 
 function openSaveAsDialog(targetWindow){
