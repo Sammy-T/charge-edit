@@ -6,6 +6,7 @@ const fs = require('fs');
 const title = document.querySelector('title');
 const editText = document.querySelector('#edit-text');
 const fileStatus = document.querySelector('#file-status');
+const contentCount = document.querySelector('#content-count');
 
 let currentFile = '';
 let unsavedChanges = false;
@@ -89,6 +90,30 @@ function saveFile(savePath){
     });
 }
 
+function onSelectionChanged(){
+    // Get all of the text leading up to the selection
+    let upToCursor = editText.value.substr(0, editText.selectionStart);
+    
+    // If we're past the first line, start after the last newline.
+    // If we're on the first line, start at the beginning.
+    let lineStart = upToCursor.lastIndexOf('\n');
+    lineStart = ((lineStart > -1) ? lineStart+1 : 0);
+    
+    let currentLine = upToCursor.substr(lineStart);
+    
+    let line = (upToCursor.match(/\n/g) || []).length + 1; // Match the newlines to find the line count
+    let col = currentLine.length + 1;
+    
+    let totalLines = (editText.value.match(/\n/g) || []).length + 1;
+    
+//    console.log(`[${line},${col}] - ${editText.textLength} ${currentLine.replace(/\n/, '')}`);
+//    if(document.getSelection().toString().length > 0){
+//        console.log(`${document.getSelection()}`);
+//    }
+    
+    contentCount.innerHTML = `line ${line}, col ${col} -  ${totalLines} lines`;
+}
+
 // Listen for input changes on the text area
 // and display an indication of unsaved changes
 editText.addEventListener('input', function(event) {
@@ -99,7 +124,7 @@ editText.addEventListener('input', function(event) {
 });
 
 editText.onkeydown = function(event) {
-    // Listen for Tab key events on the text area
+    // Listen for key events on the text area
     if(event.key === 'Tab'){
         event.preventDefault();
         
@@ -115,5 +140,14 @@ editText.onkeydown = function(event) {
             unsavedChanges = true;
             updateCurrentFile(currentFile);
         }
+    }else if(event.key === 'Backspace'){
+        // Trigger the response to the change with a delay
+        // since the onkeydown function returns before the content changes and makes the data we access stale.
+        setTimeout(onSelectionChanged, 30);
     }
 };
+
+document.addEventListener('selectionchange', function(event) {
+    if(document.activeElement.id !== editText.id) return; // Only respond to changes from the text area
+    onSelectionChanged();
+});
