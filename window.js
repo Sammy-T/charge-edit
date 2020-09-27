@@ -141,6 +141,20 @@ editText.onkeydown = function(event) {
             updateCurrentFile(currentFile);
         }
     }else if(event.key === 'Backspace'){
+        // Get all of the text leading up to the selection
+        let upToCursor = this.value.substr(0, this.selectionStart);
+        
+        // If we're backspacing a tab, delete the whole tab
+        if(upToCursor.endsWith(' '.repeat(tabSpaces))){
+            event.preventDefault();
+            
+            const selectStart = this.selectionStart;
+            
+            this.value = upToCursor.substr(0, this.selectionStart - tabSpaces) + this.value.substr(this.selectionEnd);
+            
+            this.selectionEnd = selectStart - tabSpaces;
+        }
+        
         // Trigger the response to the change with a delay
         // since the onkeydown function returns before the content changes and makes the data we access stale.
         setTimeout(onSelectionChanged, 30);
