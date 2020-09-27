@@ -90,6 +90,74 @@ function saveFile(savePath){
     });
 }
 
+function handleTab(event){
+    event.preventDefault();
+    
+    const selectStart = editText.selectionStart;
+
+    // Insert the tab spaces at the selection
+    editText.value = editText.value.substr(0, editText.selectionStart) + ' '.repeat(tabSpaces) + editText.value.substr(editText.selectionEnd);
+
+    editText.selectionEnd = selectStart + tabSpaces; // Update the selection position
+
+    // Update the unsaved changes
+    if(!unsavedChanges){
+        unsavedChanges = true;
+        updateCurrentFile(currentFile);
+    }
+}
+
+function handleBackspace(event){
+    // Get all of the text leading up to the selection
+    let upToCursor = editText.value.substr(0, editText.selectionStart);
+
+    // If we're backspacing a tab, delete the whole tab
+    if(upToCursor.endsWith(' '.repeat(tabSpaces))){
+        event.preventDefault();
+
+        const selectStart = editText.selectionStart;
+
+        editText.value = upToCursor.substr(0, editText.selectionStart - tabSpaces) + editText.value.substr(editText.selectionEnd);
+
+        editText.selectionEnd = selectStart - tabSpaces;
+    }
+
+    // Trigger the response to the change with a delay
+    // since the onkeydown function returns before the content changes and makes the data we access stale.
+    setTimeout(onSelectionChanged, 30);
+}
+
+function handleEnter(event){
+    // Get all of the text leading up to the selection
+    let upToCursor = editText.value.substr(0, editText.selectionStart);
+    
+    // If we're past the first line, start after the last newline.
+    // If we're on the first line, start at the beginning.
+    let lineStart = upToCursor.lastIndexOf('\n');
+    lineStart = ((lineStart > -1) ? lineStart+1 : 0);
+    
+    let currentLine = upToCursor.substr(lineStart);
+    
+    // Determine the leading tabs on the line
+    // (There's probably a way to do this with regex but.. yeah)
+    let tabs = 0;
+    while(currentLine.startsWith(' '.repeat(tabSpaces))){
+        currentLine = currentLine.substr(tabSpaces-1);
+        tabs++;
+    }
+    
+    // Add any existing tabs to the new line
+    if(tabs > 0){
+        event.preventDefault();
+        
+        const selectStart = editText.selectionStart;
+        
+        editText.value = upToCursor + '\n' + ' '.repeat(tabSpaces).repeat(tabs) + editText.value.substr(editText.selectionEnd);
+        
+        editText.selectionEnd = selectStart + (tabSpaces * tabs) + 1;
+    }
+}
+
 function onSelectionChanged(){
     // Get all of the text leading up to the selection
     let upToCursor = editText.value.substr(0, editText.selectionStart);
@@ -125,39 +193,18 @@ editText.addEventListener('input', function(event) {
 
 editText.onkeydown = function(event) {
     // Listen for key events on the text area
-    if(event.key === 'Tab'){
-        event.preventDefault();
-        
-        const selectStart = this.selectionStart;
-        
-        // Insert the tab spaces at the selection
-        this.value = this.value.substr(0, this.selectionStart) + ' '.repeat(tabSpaces) + this.value.substr(this.selectionEnd);
-        
-        this.selectionEnd = selectStart + tabSpaces; // Update the selection position
-        
-        // Update the unsaved changes
-        if(!unsavedChanges){
-            unsavedChanges = true;
-            updateCurrentFile(currentFile);
-        }
-    }else if(event.key === 'Backspace'){
-        // Get all of the text leading up to the selection
-        let upToCursor = this.value.substr(0, this.selectionStart);
-        
-        // If we're backspacing a tab, delete the whole tab
-        if(upToCursor.endsWith(' '.repeat(tabSpaces))){
-            event.preventDefault();
+    switch(event.key){
+        case 'Tab':
+            handleTab(event);
+            break;
             
-            const selectStart = this.selectionStart;
+        case 'Backspace':
+            handleBackspace(event);
+            break;
             
-            this.value = upToCursor.substr(0, this.selectionStart - tabSpaces) + this.value.substr(this.selectionEnd);
-            
-            this.selectionEnd = selectStart - tabSpaces;
-        }
-        
-        // Trigger the response to the change with a delay
-        // since the onkeydown function returns before the content changes and makes the data we access stale.
-        setTimeout(onSelectionChanged, 30);
+        case 'Enter':
+            handleEnter(event);
+            break;
     }
 };
 
