@@ -179,6 +179,15 @@ function addWindowListeners(win){
             menu.popup({window: win});
         }
     });
+    
+    
+    win.on('close', (event) => {
+        event.preventDefault();
+        
+        // Inform the window that we're trying to close it
+        // and need a response with the window's file and file-status info.
+        win.webContents.send('on-close', win.id);
+    });
 }
 
 function openSaveAsDialog(targetWindow){
@@ -201,12 +210,54 @@ function openSaveAsDialog(targetWindow){
       });
 }
 
+function openConfirmCloseDialog(targetWindow, filePath){
+    const path = require('path');
+    
+    const options = {
+        title: `Charge Edit - ${path.basename(filePath)}`,
+        message: 'Do you want to save before closing?',
+        buttons: ["Save", "Don't Save", "Cancel"],
+        defaultId: 0,
+        cancelId: 2,
+        noLink: true
+    };
+
+    dialog.showMessageBox(targetWindow, options).then(result => {
+        // Respond to which dialog button was pressed
+        switch(result.response){
+            case 0: // Save
+                targetWindow.webContents.send('save', targetWindow.id);
+                break;
+                
+            case 1: // Don't Save
+                targetWindow.destroy();
+                break;
+        }
+    }).catch(err => {
+        console.log(err);
+    });
+}
+
 // Respond to a Renderer process requesting to open the save dialog.
 // The Renderer will trigger a save dialog request when the user
 // initiates a save (Ctrl/Cmd+S) with no open/saved file as the current file.
 ipcMain.on('open-save-dialog', (event, windowId) => {
     const win = BrowserWindow.fromId(windowId);
     openSaveAsDialog(win);
+});
+
+// Respond to a Renderer process requesting to confirm closing.
+// The confirm flow is initiated by Main which alerts the Renderer to the close attempt,
+// the Renderer responds with the relevant file & save-state info,
+// and Main determines whether to close or show the confirm dialog.
+ipcMain.on('confirm-close', (event, res) => {
+    const win = BrowserWindow.fromId(res.windowId);
+    
+    if(res.close){
+        win.destroy();
+    }else{
+        openConfirmCloseDialog(win, res.filePath);
+    }
 });
 
 // This method will be called when Electron has finished

@@ -19,6 +19,17 @@ let tabBackspacing = true;
 let autoIndenting = true;
 let tabSpaces = 4;
 
+// Respond to close events on the window
+ipcRenderer.on('on-close', (event, windowId) => {
+    const res = {
+        windowId: windowId,
+        close: !unsavedChanges,
+        filePath: currentFile
+    };
+    
+    ipcRenderer.send('confirm-close', res);
+});
+
 // Respond to the 'new' menu item or shortcut.
 // Resets the window condition and clears the current file.
 ipcRenderer.on('new', (event) => {
