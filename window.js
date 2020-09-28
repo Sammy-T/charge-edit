@@ -9,10 +9,14 @@ const fileStatus = document.querySelector('#file-status');
 const contentCount = document.querySelector('#content-count');
 const encodingSelect = document.querySelector('#content-encoding');
 const spaceSelect = document.querySelector('#tab-space-count');
+const tabBackIc = document.querySelector('#tab-backspace-ic');
+const autoIndentIc = document.querySelector('#auto-indent-ic');
 
 let currentFile = '';
 let unsavedChanges = false;
 
+let tabBackspacing = true;
+let autoIndenting = true;
 let tabSpaces = 4;
 
 // Respond to the 'new' menu item or shortcut.
@@ -122,7 +126,7 @@ function handleBackspace(event){
     let upToCursor = editText.value.substr(0, editText.selectionStart);
 
     // If we're backspacing a tab, delete the whole tab
-    if(upToCursor.endsWith(' '.repeat(tabSpaces))){
+    if(tabBackspacing && upToCursor.endsWith(' '.repeat(tabSpaces))){
         event.preventDefault();
 
         const selectStart = editText.selectionStart;
@@ -138,6 +142,8 @@ function handleBackspace(event){
 }
 
 function handleEnter(event){
+    if(!autoIndenting) return; // Return early if auto-indenting is off
+    
     // Get all of the text leading up to the selection
     let upToCursor = editText.value.substr(0, editText.selectionStart);
     
@@ -221,6 +227,18 @@ editText.onkeydown = function(event) {
 document.addEventListener('selectionchange', function(event) {
     if(document.activeElement.id !== editText.id) return; // Only respond to changes from the text area
     onSelectionChanged();
+});
+
+tabBackIc.addEventListener('click', function(event) {
+    // Toggle tab backspacing
+    tabBackspacing = !tabBackspacing;
+    this.style.opacity = tabBackspacing ? 0.65 : 0.25;
+});
+
+autoIndentIc.addEventListener('click', function(event) {
+    // Toggle auto indenting
+    autoIndenting = !autoIndenting;
+    this.style.opacity = autoIndenting ? 0.65 : 0.25;
 });
 
 spaceSelect.addEventListener('change', () => {

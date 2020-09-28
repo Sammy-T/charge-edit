@@ -41,6 +41,18 @@ footer {
     align-items: baseline;
 }
 
+#file-info img {
+    max-height: 2rem;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 1rem;
+    opacity: 0.65;
+}
+
+#file-info img:hover {
+    outline: 1px solid gray;
+}
+
 #file-info small {
     white-space: nowrap;
 }
