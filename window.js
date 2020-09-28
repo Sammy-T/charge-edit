@@ -50,7 +50,13 @@ ipcRenderer.on('open', (event, openPaths) => {
     console.log(openPaths);
     updateCurrentFile(openPaths[0]);
     
+    // Disable the text area and show a Loading msg
+    editText.disabled = true;
+    editText.value = 'Loading...';
+    
     fs.readFile(openPaths[0], 'utf8', (err, data) => {
+        editText.disabled = false; // Enable the text area
+        
         if(err){
             console.error(err);
             return;
