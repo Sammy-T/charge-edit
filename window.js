@@ -7,6 +7,7 @@ const title = document.querySelector('title');
 const editText = document.querySelector('#edit-text');
 const fileStatus = document.querySelector('#file-status');
 const contentCount = document.querySelector('#content-count');
+const encodingSelect = document.querySelector('#content-encoding');
 
 let currentFile = '';
 let unsavedChanges = false;
@@ -54,7 +55,7 @@ ipcRenderer.on('open', (event, openPaths) => {
     editText.disabled = true;
     editText.value = 'Loading...';
     
-    fs.readFile(openPaths[0], 'utf8', (err, data) => {
+    fs.readFile(openPaths[0], encodingSelect.value, (err, data) => {
         editText.disabled = false; // Enable the text area
         
         if(err){
@@ -85,7 +86,7 @@ function updateCurrentFile(filePath){
 }
 
 function saveFile(savePath){
-    fs.writeFile(savePath, editText.value, 'utf8', err => {
+    fs.writeFile(savePath, editText.value, encodingSelect.value, err => {
         if(err){
             console.error(err);
             return;

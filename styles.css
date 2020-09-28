@@ -31,3 +31,19 @@ footer {
     height: 100%;
     padding: 0.5em;
 }
+
+#file-info {
+    display: flex;
+    align-items: baseline;
+}
+
+#content-count {
+    white-space: nowrap;
+}
+
+#content-encoding {
+    height: 2.5rem;
+    margin-bottom: 0rem;
+    margin-left: 1rem;
+    font-size: 0.7em;
+}
