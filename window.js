@@ -8,6 +8,7 @@ const editText = document.querySelector('#edit-text');
 const fileStatus = document.querySelector('#file-status');
 const contentCount = document.querySelector('#content-count');
 const encodingSelect = document.querySelector('#content-encoding');
+const spaceSelect = document.querySelector('#tab-space-count');
 
 let currentFile = '';
 let unsavedChanges = false;
@@ -65,6 +66,8 @@ ipcRenderer.on('open', (event, openPaths) => {
         
         console.log(data);
         editText.value = data; // Display the file contents in the text area
+        
+        onSelectionChanged(); // Update the line count
     });
 });
 
@@ -218,4 +221,8 @@ editText.onkeydown = function(event) {
 document.addEventListener('selectionchange', function(event) {
     if(document.activeElement.id !== editText.id) return; // Only respond to changes from the text area
     onSelectionChanged();
+});
+
+spaceSelect.addEventListener('change', () => {
+    tabSpaces = spaceSelect.valueAsNumber;
 });

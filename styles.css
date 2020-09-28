@@ -32,18 +32,34 @@ footer {
     padding: 0.5em;
 }
 
+#file-status {
+    min-width: 6rem;
+}
+
 #file-info {
     display: flex;
     align-items: baseline;
 }
 
-#content-count {
+#file-info small {
     white-space: nowrap;
 }
 
 #content-encoding {
-    height: 2.5rem;
+    max-height: 2.5rem;
+    max-width: 10rem;
     margin-bottom: 0rem;
     margin-left: 1rem;
     font-size: 0.7em;
+}
+
+#tab-spaces-label{
+    margin-left: 1rem;
+    margin-right: 0.25rem;
+}
+
+#tab-space-count {
+    max-height: 2.5rem;
+    max-width: 6rem;
+    margin-bottom: 0rem;
 }
