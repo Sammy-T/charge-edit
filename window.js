@@ -90,18 +90,51 @@ ipcRenderer.on('open', (event, openPaths) => {
 ipcRenderer.on('find-text', (event, res) => {
     if(editText.value === '') return;
     
+    // Requesing focus seems to resolve the intermittent issue where the selection occurs
+    // but it isn't being highlighted
     editText.focus();
     
+    console.log(`Entering select: [${editText.selectionStart}, ${editText.selectionEnd}] - ${editText.value.length}`);
+    
+    // Set the Search From position to the selection end
+    // or the start of the text, if the cursor is at the end
     let searchFrom = (editText.selectionEnd === editText.value.length) ? 0 : editText.selectionEnd;
     
+    // Find the total number of matching values and the next matching value's position
     const matches = editText.value.match(new RegExp(res.searchText, "gi")).length;
     const nextMatch = editText.value.toLowerCase().indexOf(res.searchText, searchFrom);
     
-    editText.selectionStart = nextMatch;
-    editText.selectionEnd = nextMatch + res.searchText.length;
+    // Select the match if one was found or reset the selection otherwise
+    if(nextMatch > -1){
+        editText.selectionStart = nextMatch;
+        editText.selectionEnd = nextMatch + res.searchText.length;
+    }else{
+        editText.selectionEnd = 0;
+    }
     
-    console.log(`matches: ${matches} from: ${searchFrom} select: ${nextMatch}`);
-    console.log(`[${editText.selectionStart}, ${editText.selectionEnd}] ${res.searchText.length}`);
+    // Find which match number is selected out of the total
+    let matchNum = 0;
+    let mIndex = 0;
+    const workingText = editText.value.toLowerCase();
+    
+    for(let i=0; i < matches; i++){
+        mIndex = workingText.indexOf(res.searchText, mIndex); // Search the text starting at the index
+        
+        if(mIndex <= nextMatch) matchNum++;
+        
+        mIndex += res.searchText.length; // Move the index to the end of the word
+    }
+    
+    const response = {
+        dialogId: res.dialogId,
+        windowId: res.windowId,
+        searchText: res.searchText,
+        matchNum: matchNum,
+        totalMatches: matches,
+        totalsText: `${matchNum}/${matches}`
+    };
+    
+    ipcRenderer.send('text-found', response);
 });
 
 // Updates the current file and the save status

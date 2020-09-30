@@ -301,6 +301,13 @@ ipcMain.on('find', (event, res) => {
     win.webContents.send('find-text', res);
 });
 
+// Respond to a Renderer process window returning search results.
+ipcMain.on('text-found', (event, res) => {
+    // Pass the window's response to the dialog
+    const dialogWin = BrowserWindow.fromId(res.dialogId);
+    dialogWin.webContents.send('on-text-found', res);
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // (Some APIs can only be used after this occurs.)
