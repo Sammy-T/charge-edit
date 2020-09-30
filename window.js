@@ -94,8 +94,6 @@ ipcRenderer.on('find-text', (event, res) => {
     // but it isn't being highlighted
     editText.focus();
     
-    console.log(`Entering select: [${editText.selectionStart}, ${editText.selectionEnd}] - ${editText.value.length}`);
-    
     // Set the Search From position to the selection end
     // or the start of the text, if the cursor is at the end
     let searchFrom = (editText.selectionEnd === editText.value.length) ? 0 : editText.selectionEnd;
