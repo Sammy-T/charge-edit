@@ -15,14 +15,17 @@
         
         <!-- Page CSS -->
         <link rel="stylesheet" href="../dialog.css">
+        
+        <!-- Scripts -->
+        <script src="find.js" defer></script>
     </head>
     
     <body>
         <main>
             <form>
                 <label for="find-field">Find what</label>
-                <input id="find-field" name="find-field" type="search" autofocus>
-                <button id="find-next" type="button">Find next</button>
+                <input id="find-field" name="find-field" type="search" required autofocus>
+                <button id="find-next">Find next</button>
                 <p id="find-total" class="float-right">0/0</p>
             </form>
         </main>

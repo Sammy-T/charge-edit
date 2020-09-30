@@ -86,6 +86,24 @@ ipcRenderer.on('open', (event, openPaths) => {
     });
 });
 
+// Respond to search requests from the find dialog
+ipcRenderer.on('find-text', (event, res) => {
+    if(editText.value === '') return;
+    
+    editText.focus();
+    
+    let searchFrom = (editText.selectionEnd === editText.value.length) ? 0 : editText.selectionEnd;
+    
+    const matches = editText.value.match(new RegExp(res.searchText, "gi")).length;
+    const nextMatch = editText.value.toLowerCase().indexOf(res.searchText, searchFrom);
+    
+    editText.selectionStart = nextMatch;
+    editText.selectionEnd = nextMatch + res.searchText.length;
+    
+    console.log(`matches: ${matches} from: ${searchFrom} select: ${nextMatch}`);
+    console.log(`[${editText.selectionStart}, ${editText.selectionEnd}] ${res.searchText.length}`);
+});
+
 // Updates the current file and the save status
 function updateCurrentFile(filePath){
     currentFile = filePath;

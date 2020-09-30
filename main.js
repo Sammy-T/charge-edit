@@ -77,6 +77,18 @@ function createMenu(){
         }]
     });
     
+    // Add to the Edit menu option.
+    template[1].submenu.push(
+        {type: 'separator'}, 
+        {
+            label: 'Find',
+            accelerator: 'CmdOrCtrl+F',
+            click: (item, focusedWindow) => {
+                openFindDialog(focusedWindow);
+            }
+        }
+    );
+    
     // Remove the View->Reload menu option.
     // Reloading causes the fs module in the Renderer window to stop functioning.
     template[2].submenu.shift();
@@ -238,6 +250,28 @@ function openConfirmCloseDialog(targetWindow, filePath){
     });
 }
 
+function openFindDialog(targetWindow){
+    // Create the browser window
+    const dialogWin = new BrowserWindow({
+        width: 400,
+        height: 250,
+        parent: targetWindow,
+        show: false,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+    
+    dialogWin.setMenu(null); // Remove the menu
+    
+    dialogWin.loadFile('windows/dialog-find/dialog-find.html');
+    
+    dialogWin.once('ready-to-show', () => {
+        dialogWin.show();
+        dialogWin.webContents.send('on-show', {windowId: dialogWin.id, parentId: targetWindow.id});
+    });
+}
+
 // Respond to a Renderer process requesting to open the save dialog.
 // The Renderer will trigger a save dialog request when the user
 // initiates a save (Ctrl/Cmd+S) with no open/saved file as the current file.
@@ -258,6 +292,13 @@ ipcMain.on('confirm-close', (event, res) => {
     }else{
         openConfirmCloseDialog(win, res.filePath);
     }
+});
+
+// Respond to a Renderer process dialog submitting search text.
+ipcMain.on('find', (event, res) => {
+    // Pass the dialog's response to the parent window
+    const win = BrowserWindow.fromId(res.windowId);
+    win.webContents.send('find-text', res);
 });
 
 // This method will be called when Electron has finished
