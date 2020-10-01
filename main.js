@@ -337,6 +337,13 @@ ipcMain.on('text-found', (event, res) => {
     dialogWin.webContents.send('on-text-found', res);
 });
 
+// Respond to a Renderer process dialog submitting replace text.
+ipcMain.on('replace', (event, res) => {
+    // Pass the dialog's response to the parent window
+    const win = BrowserWindow.fromId(res.windowId);
+    win.webContents.send('replace-text', res);
+});
+
 // Respond to a Renderer process dialog requesting to close.
 ipcMain.on('close-dialog', (event, dialogId) => {
     const dialogWin = BrowserWindow.fromId(dialogId);

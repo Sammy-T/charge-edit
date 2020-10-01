@@ -88,7 +88,45 @@ ipcRenderer.on('open', (event, openPaths) => {
 
 // Respond to search requests from the find dialog
 ipcRenderer.on('find-text', (event, res) => {
+    findText(res);
+});
+
+ipcRenderer.on('replace-text', (event, res) => {
+    replaceText(res);
+});
+
+// Updates the current file and the save status
+function updateCurrentFile(filePath){
+    currentFile = filePath;
+    
+    let titleText = `Charge Edit - ${filePath}`;
+    if(unsavedChanges){
+        titleText += "*";
+        fileStatus.innerHTML = "unsaved";
+    }else if(filePath === ''){
+        fileStatus.innerHTML = "unsaved";
+    }else{
+        fileStatus.innerHTML = "saved";
+    }
+    
+    title.innerHTML = titleText;
+}
+
+function saveFile(savePath){
+    fs.writeFile(savePath, editText.value, encodingSelect.value, err => {
+        if(err){
+            console.error(err);
+            return;
+        }
+        
+        unsavedChanges = false;
+        updateCurrentFile(savePath);
+    });
+}
+
+function findText(res){
     if(editText.value === '') return;
+    console.log('find text');
     
     // Requesing focus seems to resolve the intermittent issue where the selection occurs
     // but it isn't being highlighted
@@ -99,7 +137,7 @@ ipcRenderer.on('find-text', (event, res) => {
     let searchFrom = (editText.selectionEnd === editText.value.length) ? 0 : editText.selectionEnd;
     
     // Find the total number of matching values and the next matching value's position
-    const matches = editText.value.match(new RegExp(res.searchText, "gi")).length;
+    const matches = (editText.value.match(new RegExp(res.searchText, "gi")) || []).length;
     const nextMatch = editText.value.toLowerCase().indexOf(res.searchText, searchFrom);
     
     // Select the match if one was found or reset the selection otherwise
@@ -133,35 +171,20 @@ ipcRenderer.on('find-text', (event, res) => {
     };
     
     ipcRenderer.send('text-found', response);
-});
-
-// Updates the current file and the save status
-function updateCurrentFile(filePath){
-    currentFile = filePath;
-    
-    let titleText = `Charge Edit - ${filePath}`;
-    if(unsavedChanges){
-        titleText += "*";
-        fileStatus.innerHTML = "unsaved";
-    }else if(filePath === ''){
-        fileStatus.innerHTML = "unsaved";
-    }else{
-        fileStatus.innerHTML = "saved";
-    }
-    
-    title.innerHTML = titleText;
 }
 
-function saveFile(savePath){
-    fs.writeFile(savePath, editText.value, encodingSelect.value, err => {
-        if(err){
-            console.error(err);
-            return;
-        }
-        
-        unsavedChanges = false;
-        updateCurrentFile(savePath);
-    });
+function replaceText(res){
+    if(editText.value === '' || document.getSelection().toString().length === 0) return;
+    
+    // Replace the selected text
+    editText.value = editText.value.substring(0, editText.selectionStart) + res.replaceText + editText.value.substring(editText.selectionEnd);
+    
+    if(!unsavedChanges){
+        unsavedChanges = true;
+        updateCurrentFile(currentFile);
+    }
+    
+    findText(res); // Move to the next match
 }
 
 function handleTab(event){
