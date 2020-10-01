@@ -193,7 +193,7 @@ function handleTab(event){
     const selectStart = editText.selectionStart;
 
     // Insert the tab spaces at the selection
-    editText.value = editText.value.substr(0, editText.selectionStart) + ' '.repeat(tabSpaces) + editText.value.substr(editText.selectionEnd);
+    editText.value = editText.value.substring(0, editText.selectionStart) + ' '.repeat(tabSpaces) + editText.value.substring(editText.selectionEnd);
 
     editText.selectionEnd = selectStart + tabSpaces; // Update the selection position
 
@@ -206,7 +206,7 @@ function handleTab(event){
 
 function handleBackspace(event){
     // Get all of the text leading up to the selection
-    let upToCursor = editText.value.substr(0, editText.selectionStart);
+    let upToCursor = editText.value.substring(0, editText.selectionStart);
 
     // If we're backspacing a tab, delete the whole tab
     if(tabBackspacing && upToCursor.endsWith(' '.repeat(tabSpaces))){
@@ -214,7 +214,7 @@ function handleBackspace(event){
 
         const selectStart = editText.selectionStart;
 
-        editText.value = upToCursor.substr(0, editText.selectionStart - tabSpaces) + editText.value.substr(editText.selectionEnd);
+        editText.value = upToCursor.substring(0, editText.selectionStart - tabSpaces) + editText.value.substring(editText.selectionEnd);
 
         editText.selectionEnd = selectStart - tabSpaces;
     }
@@ -228,20 +228,20 @@ function handleEnter(event){
     if(!autoIndenting) return; // Return early if auto-indenting is off
     
     // Get all of the text leading up to the selection
-    let upToCursor = editText.value.substr(0, editText.selectionStart);
+    let upToCursor = editText.value.substring(0, editText.selectionStart);
     
     // If we're past the first line, start after the last newline.
     // If we're on the first line, start at the beginning.
     let lineStart = upToCursor.lastIndexOf('\n');
     lineStart = ((lineStart > -1) ? lineStart+1 : 0);
     
-    let currentLine = upToCursor.substr(lineStart);
+    let currentLine = upToCursor.substring(lineStart);
     
     // Determine the leading tabs on the line
     // (There's probably a way to do this with regex but.. yeah)
     let tabs = 0;
     while(currentLine.startsWith(' '.repeat(tabSpaces))){
-        currentLine = currentLine.substr(tabSpaces-1);
+        currentLine = currentLine.substring(tabSpaces-1);
         tabs++;
     }
     
@@ -251,7 +251,7 @@ function handleEnter(event){
         
         const selectStart = editText.selectionStart;
         
-        editText.value = upToCursor + '\n' + ' '.repeat(tabSpaces).repeat(tabs) + editText.value.substr(editText.selectionEnd);
+        editText.value = upToCursor + '\n' + ' '.repeat(tabSpaces).repeat(tabs) + editText.value.substring(editText.selectionEnd);
         
         editText.selectionEnd = selectStart + (tabSpaces * tabs) + 1;
     }
@@ -259,14 +259,14 @@ function handleEnter(event){
 
 function onSelectionChanged(){
     // Get all of the text leading up to the selection
-    let upToCursor = editText.value.substr(0, editText.selectionStart);
+    let upToCursor = editText.value.substring(0, editText.selectionStart);
     
     // If we're past the first line, start after the last newline.
     // If we're on the first line, start at the beginning.
     let lineStart = upToCursor.lastIndexOf('\n');
     lineStart = ((lineStart > -1) ? lineStart+1 : 0);
     
-    let currentLine = upToCursor.substr(lineStart);
+    let currentLine = upToCursor.substring(lineStart);
     
     let line = (upToCursor.match(/\n/g) || []).length + 1; // Match the newlines to find the line count
     let col = currentLine.length + 1;
