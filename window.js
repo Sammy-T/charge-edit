@@ -86,11 +86,12 @@ ipcRenderer.on('open', (event, openPaths) => {
     });
 });
 
-// Respond to search requests from the find dialog
+// Respond to search requests from the find/replace dialogs
 ipcRenderer.on('find-text', (event, res) => {
     findText(res);
 });
 
+// Respond to replace requests from the replace dialog
 ipcRenderer.on('replace-text', (event, res) => {
     replaceText(res);
 });
@@ -126,7 +127,6 @@ function saveFile(savePath){
 
 function findText(res){
     if(editText.value === '') return;
-    console.log('find text');
     
     // Requesing focus seems to resolve the intermittent issue where the selection occurs
     // but it isn't being highlighted
