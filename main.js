@@ -308,6 +308,12 @@ ipcMain.on('text-found', (event, res) => {
     dialogWin.webContents.send('on-text-found', res);
 });
 
+// Respond to a Renderer process dialog requesting to close.
+ipcMain.on('close-dialog', (event, dialogId) => {
+    const dialogWin = BrowserWindow.fromId(dialogId);
+    dialogWin.close();
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // (Some APIs can only be used after this occurs.)

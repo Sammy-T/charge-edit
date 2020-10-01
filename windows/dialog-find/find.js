@@ -21,6 +21,11 @@ ipcRenderer.on('on-text-found', (event, res) => {
     findTotal.innerHTML = res.totalsText;
 });
 
+window.addEventListener('keyup', (event) => {
+    // Signal to close the dialog when Escape is pressed
+    if(event.key === 'Escape') ipcRenderer.send('close-dialog', dialogId);
+});
+
 // Pass along the search text value when the form is submitted
 document.querySelector('form').addEventListener('submit', function(event) {
     event.preventDefault();
