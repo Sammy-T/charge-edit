@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+        
+        <title>Replace</title>
+        
+        <!-- Milligram -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+        
+        <!-- Page CSS -->
+        <link rel="stylesheet" href="../dialog.css">
+        
+        <!-- Scripts -->
+<!--        <script src="find.js" defer></script>-->
+    </head>
+    
+    <body>
+        <main>
+            <form>
+                <label for="find-field">Find what</label>
+                <input id="find-field" name="find-field" type="search" required autofocus>
+                
+                <label for="replace-field">Replace with</label>
+                <input id="replace-field" name="replace-field">
+                
+                <button id="find-next">Find next</button>
+                <button id="replace">Replace</button>
+                <p id="find-total" class="float-right">0/0</p>
+            </form>
+        </main>
+    </body>
+</html>

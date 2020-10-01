@@ -86,6 +86,13 @@ function createMenu(){
             click: (item, focusedWindow) => {
                 openFindDialog(focusedWindow);
             }
+        },
+        {
+            label: 'Replace',
+            accelerator: 'CmdOrCtrl+H',
+            click: (item, focusedWindow) => {
+                openReplaceDialog(focusedWindow);
+            }
         }
     );
     
@@ -265,6 +272,28 @@ function openFindDialog(targetWindow){
     dialogWin.setMenu(null); // Remove the menu
     
     dialogWin.loadFile('windows/dialog-find/dialog-find.html');
+    
+    dialogWin.once('ready-to-show', () => {
+        dialogWin.show();
+        dialogWin.webContents.send('on-show', {windowId: dialogWin.id, parentId: targetWindow.id});
+    });
+}
+
+function openReplaceDialog(targetWindow){
+    // Create the browser window
+    const dialogWin = new BrowserWindow({
+        width: 400,
+        height: 325,
+        parent: targetWindow,
+        show: false,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+    
+    dialogWin.setMenu(null); // Remove the menu
+    
+    dialogWin.loadFile('windows/dialog-replace/dialog-replace.html');
     
     dialogWin.once('ready-to-show', () => {
         dialogWin.show();
