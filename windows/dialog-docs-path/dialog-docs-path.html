@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+        
+        <title>Select document directory</title>
+        
+        <!-- Milligram -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+        
+        <!-- Page CSS -->
+        <link rel="stylesheet" href="../dialog.css">
+        <link rel="stylesheet" href="dialog-docs-path.css">
+        
+        <!-- Scripts -->
+<!--        <script src="find.js" defer></script>-->
+    </head>
+    
+    <body>
+        <main>
+            <form>
+                <div>
+                    <input type="radio" id="default-path" name="docs-path" value="default" checked>
+                    <label for="default-path" class="label-inline">Default directory - <em>/charge-edit/documents</em></label>
+                </div>
+                <div class="align-elements">
+                    <input type="radio" id="custom-path" name="docs-path" value="custom">
+                    <input type="text" id="path-text" name="docs-path" placeholder="Custom/documents/directory">
+                    <button type="button" id="select-directory">...</button>
+                </div>
+                
+                <button id="save" class="float-right">Save</button>
+            </form>
+        </main>
+    </body>
+</html>

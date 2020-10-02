@@ -1,0 +1,12 @@
+.align-elements {
+    display: flex;
+    align-items: baseline;
+}
+#path-text {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+#select-directory {
+    padding: 0 1rem;
+}
