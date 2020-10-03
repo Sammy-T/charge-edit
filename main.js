@@ -40,7 +40,7 @@ function readPreferences(){
 }
 
 function updatePreferences(){
-    fs.writeFile(PREFS_FILE, JSON.stringify(preferences), ENCODING, (err) => {
+    fs.writeFile(PREFS_FILE, JSON.stringify(preferences, null, 2), ENCODING, (err) => {
         if(err){
             console.log(`Warn: Unable to update prefs file.\n${err}`);
         }
