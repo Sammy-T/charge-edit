@@ -13,6 +13,14 @@ let dialogId = null;
 // Store the window ids of the dialog and its parent window.
 ipcRenderer.on('on-show', (event, res) => {
     dialogId = res.windowId;
+    
+    if(res.docsDir !== 'default'){
+        // Update the custom path values
+        pathTextField.value = res.docsDir;
+        customPathRadio.value = res.docsDir;
+        
+        customPathRadio.checked = true;
+    }
 });
 
 // Respond to the returned path(s) of the open directory dialog

@@ -366,7 +366,10 @@ function openDocPathDialog(){
     
     dialogWin.once('ready-to-show', () => {
         dialogWin.show();
-        dialogWin.webContents.send('on-show', {windowId: dialogWin.id});
+        dialogWin.webContents.send('on-show', {
+            windowId: dialogWin.id, 
+            docsDir: preferences.docsDir
+        });
     });
 }
 
