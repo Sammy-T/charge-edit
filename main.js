@@ -23,9 +23,22 @@ function initDirectory(){
 }
 
 function readPreferences(){
+    function setDefaults(){
+        console.log('Creating new prefs file.');
+        
+        preferences = {
+            docsDir: 'default'
+        };
+        
+        docPath = path.join(app.getAppPath(), '/documents');
+        
+        updatePreferences();
+    }
+    
     fs.readFile(PREFS_FILE, ENCODING, (err, data) => {
         if(err){
             console.log(`Warn: Unable to read prefs file.\n${err}`);
+            setDefaults();
             return;
         }
         
