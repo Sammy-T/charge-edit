@@ -2,21 +2,49 @@
 
 const {app, BrowserWindow, Menu, MenuItem, shell, dialog, ipcMain} = require('electron');
 const defaultMenu = require('electron-default-menu');
+const fs = require('fs');
+const path = require('path');
+
+const PREFS_FILE = 'charge-prefs.json';
+const ENCODING = 'utf8';
 
 let docPath = null;
+let preferences = null;
 
 // Create the documents directory if it doesn't already exist
 function initDirectory(){
-    const fs = require('fs');
-    const path = require('path');
+    const defaultDocPath = path.join(app.getAppPath(), '/documents');
     
-    docPath = path.join(app.getAppPath(), '/documents');
-    
-    fs.mkdir(docPath, err => {
+    fs.mkdir(defaultDocPath, err => {
             if(err){
                 console.log(`Warn: Unable to create directory at ${docPath}\n${err}`);
             }
         });
+}
+
+function readPreferences(){
+    fs.readFile(PREFS_FILE, ENCODING, (err, data) => {
+        if(err){
+            console.log(`Warn: Unable to read prefs file.\n${err}`);
+            return;
+        }
+        
+        preferences = JSON.parse(data);
+        
+        if(preferences.docsDir === 'default'){
+            docPath = path.join(app.getAppPath(), '/documents');
+        }else{
+            docPath = preferences.docsDir;
+        }
+    });
+}
+
+function updatePreferences(){
+    fs.writeFile(PREFS_FILE, JSON.stringify(preferences), ENCODING, (err) => {
+        if(err){
+            console.log(`Warn: Unable to update prefs file.\n${err}`);
+        }
+    });
 }
 
 function createMenu(){
@@ -92,6 +120,15 @@ function createMenu(){
             accelerator: 'CmdOrCtrl+H',
             click: (item, focusedWindow) => {
                 openReplaceDialog(focusedWindow);
+            }
+        }
+    );
+    
+    template[4].submenu.unshift(
+        {
+            label: 'Document Directory Options',
+            click: (item, focusedWindow) => {
+                openDocPathDialog();
             }
         }
     );
@@ -230,8 +267,6 @@ function openSaveAsDialog(targetWindow){
 }
 
 function openConfirmCloseDialog(targetWindow, filePath){
-    const path = require('path');
-    
     const options = {
         title: `Charge Edit - ${path.basename(filePath)}`,
         message: 'Do you want to save before closing?',
@@ -301,6 +336,45 @@ function openReplaceDialog(targetWindow){
     });
 }
 
+function openDocPathDialog(){
+    // Create the browser window
+    const dialogWin = new BrowserWindow({
+        width: 550,
+        height: 250,
+        show: false,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+    
+    dialogWin.setMenu(null); // Remove the menu
+    
+    dialogWin.loadFile('windows/dialog-docs-path/dialog-docs-path.html');
+    
+    dialogWin.once('ready-to-show', () => {
+        dialogWin.show();
+        dialogWin.webContents.send('on-show', {windowId: dialogWin.id});
+    });
+}
+
+ipcMain.on('open-sys-dir-dialog', (event, windowId) => {
+    const win = BrowserWindow.fromId(windowId);
+    
+    const options = {
+        title: 'Charge Edit - Select a directory',
+        defaultPath: docPath,
+        properties: ['openDirectory']
+    };
+
+    dialog.showOpenDialog(win, options).then(result => {
+        if(result.filePaths.length > 0){
+            win.webContents.send('selected-directory', result.filePaths);
+        }
+    }).catch(err => {
+        console.log(err);
+    });
+});
+
 // Respond to a Renderer process requesting to open the save dialog.
 // The Renderer will trigger a save dialog request when the user
 // initiates a save (Ctrl/Cmd+S) with no open/saved file as the current file.
@@ -350,11 +424,28 @@ ipcMain.on('close-dialog', (event, dialogId) => {
     dialogWin.close();
 });
 
+ipcMain.on('set-docs-path', (event, res) => {
+    // Set the document directory
+    docPath = res.path;
+    
+    if(docPath === 'default'){
+        docPath = path.join(app.getAppPath(), '/documents');
+    }
+    
+    // Update the preferences variable and the preference file
+    preferences.docsDir = res.path;
+    updatePreferences();
+    
+    const win = BrowserWindow.fromId(res.windowId);
+    win.close();
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // (Some APIs can only be used after this occurs.)
 app.whenReady().then(() => {
     initDirectory();
+    readPreferences();
     createMenu();
     createWindow();
 });
