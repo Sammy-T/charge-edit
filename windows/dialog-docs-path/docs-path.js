@@ -17,6 +17,10 @@ ipcRenderer.on('on-show', (event, res) => {
 
 // Respond to the returned path(s) of the open directory dialog
 ipcRenderer.on('selected-directory', (event, selectedPaths) => {
+    if(!pathTextField.validity.valid){
+        pathTextField.setCustomValidity('');
+    }
+    
     pathTextField.value = selectedPaths[0];
     customPathRadio.value = selectedPaths[0];
 });
