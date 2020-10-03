@@ -117,3 +117,6 @@ dist
 
 # User created document files
 /documents
+
+# App preferences file(s)
+charge-prefs.json
