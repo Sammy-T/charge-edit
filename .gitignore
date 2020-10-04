@@ -120,3 +120,6 @@ dist
 
 # App preferences file(s)
 charge-prefs.json
+
+# Packaged app files
+/build

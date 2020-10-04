@@ -8,6 +8,7 @@ const path = require('path');
 const PREFS_FILE = 'charge-prefs.json';
 const ENCODING = 'utf8';
 
+let appIcon = null;
 let docPath = null;
 let preferences = null;
 
@@ -159,6 +160,7 @@ function createWindow(){
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        icon: appIcon,
         webPreferences: {
             nodeIntegration: true
         }
@@ -310,6 +312,7 @@ function openFindDialog(targetWindow){
     const dialogWin = new BrowserWindow({
         width: 400,
         height: 250,
+        icon: appIcon,
         parent: targetWindow,
         show: false,
         webPreferences: {
@@ -332,6 +335,7 @@ function openReplaceDialog(targetWindow){
     const dialogWin = new BrowserWindow({
         width: 400,
         height: 325,
+        icon: appIcon,
         parent: targetWindow,
         show: false,
         webPreferences: {
@@ -354,6 +358,7 @@ function openDocPathDialog(){
     const dialogWin = new BrowserWindow({
         width: 550,
         height: 250,
+        icon: appIcon,
         show: false,
         webPreferences: {
             nodeIntegration: true
@@ -460,6 +465,8 @@ ipcMain.on('set-docs-path', (event, res) => {
 // initialization and is ready to create browser windows.
 // (Some APIs can only be used after this occurs.)
 app.whenReady().then(() => {
+    appIcon = path.join(__dirname, '/img/ic_charge_edit.png');
+    
     initDirectory();
     readPreferences();
     createMenu();
