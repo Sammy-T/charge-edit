@@ -147,10 +147,6 @@ function createMenu(){
         }
     );
     
-    // Remove the View->Reload menu option.
-    // Reloading causes the fs module in the Renderer window to stop functioning.
-    template[2].submenu.shift();
-    
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
 }
