@@ -5,7 +5,7 @@ on:
     branches:
       - master
     tags:
-      - 'v*' # Events tagged with version codes
+      - v* # Events tagged with version codes
 
 jobs:
   release:
