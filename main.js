@@ -313,6 +313,7 @@ function openFindDialog(targetWindow){
         parent: targetWindow,
         show: false,
         webPreferences: {
+            contextIsolation: false,
             nodeIntegration: true
         }
     });
@@ -336,6 +337,7 @@ function openReplaceDialog(targetWindow){
         parent: targetWindow,
         show: false,
         webPreferences: {
+            contextIsolation: false,
             nodeIntegration: true
         }
     });
@@ -358,6 +360,7 @@ function openDocPathDialog(){
         icon: appIcon,
         show: false,
         webPreferences: {
+            contextIsolation: false,
             nodeIntegration: true
         }
     });
