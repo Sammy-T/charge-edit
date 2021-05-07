@@ -12,7 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^12.0.7",
-    "electron-builder": "^22.11.1",
+    "electron-builder": "^22.10.5",
     "electron-packager": "^15.2.0"
   },
   "dependencies": {
@@ -20,13 +20,19 @@
   },
   "build": {
     "win": {
-      "publish": ["github"]
+      "publish": [
+        "github"
+      ]
     },
     "linux": {
-      "publish": ["github"]
+      "publish": [
+        "github"
+      ]
     },
     "mac": {
-      "publish": ["github"]
+      "publish": [
+        "github"
+      ]
     }
   }
 }
