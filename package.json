@@ -5,13 +5,14 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager ./ --all --ignore=^/documents --ignore=^/gh-img --out=./build --overwrite"
+    "build:local": "electron-packager ./ --all --ignore=^/documents --ignore=^/gh-img --out=./build --overwrite"
   },
   "keywords": [],
   "author": "Samuel Telusma",
   "license": "ISC",
   "devDependencies": {
     "electron": "^12.0.7",
+    "electron-builder": "^22.11.1",
     "electron-packager": "^15.2.0"
   },
   "dependencies": {
