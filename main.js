@@ -158,6 +158,7 @@ function createWindow(){
         height: 600,
         icon: appIcon,
         webPreferences: {
+            contextIsolation: false,
             nodeIntegration: true
         }
     });
